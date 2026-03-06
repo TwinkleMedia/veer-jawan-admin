@@ -11,23 +11,31 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleLogin = async () => {
-    setLoading(true);
-    setError("");
-    const res = await fetch("/api/login", {
+ const handleLogin = async () => {
+  setLoading(true);
+  setError("");
+
+  try {
+    const res = await fetch("http://localhost:5000/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include", // important for cookies
       body: JSON.stringify({ email, password }),
     });
-    
+
     if (res.ok) {
       router.push("/admin");
     } else {
-      setError("Invalid credentials. Please try again.");
+      const data = await res.json();
+      setError(data.message || "Invalid credentials. Please try again.");
     }
-    setLoading(false);
-  };
 
+  } catch (error) {
+    setError("Server error. Please try again later.");
+  }
+
+  setLoading(false);
+};
   const handleKeyDown = (e) => {
     if (e.key === "Enter") handleLogin();
   };
