@@ -29,7 +29,7 @@ export default function AdminDashboard() {
       change: "Active volunteers",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
-          strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+          strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 sm:w-6 sm:h-6">
           <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
           <circle cx="9" cy="7" r="4" />
         </svg>
@@ -48,7 +48,7 @@ export default function AdminDashboard() {
       change: "Donations received",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
-          strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+          strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 sm:w-6 sm:h-6">
           <path d="M12 1v22" />
           <path d="M17 5H9.5a3.5 3.5 0 000 7H14a3.5 3.5 0 010 7H6" />
         </svg>
@@ -67,7 +67,7 @@ export default function AdminDashboard() {
       change: "Certificates issued",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
-          strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+          strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 sm:w-6 sm:h-6">
           <rect x="3" y="4" width="18" height="16" rx="2" />
           <path d="M8 8h8M8 12h6M8 16h4" />
         </svg>
@@ -86,7 +86,7 @@ export default function AdminDashboard() {
       change: "Registered members",
       icon: (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
-          strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+          strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 sm:w-6 sm:h-6">
           <circle cx="12" cy="7" r="4" />
           <path d="M5.5 21a6.5 6.5 0 0113 0" />
         </svg>
@@ -102,22 +102,24 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-w-7xl mx-auto w-full px-2 sm:px-4">
 
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-orange-800">Dashboard</h1>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-orange-800">
+          Dashboard
+        </h1>
         <p className="text-amber-600 text-sm">
           Welcome back Admin 🙏
         </p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
         {stats.map((stat) => (
           <div
             key={stat.label}
-            className={`rounded-2xl border ${stat.border} ${stat.bg} p-6 shadow-sm`}
+            className={`rounded-2xl border ${stat.border} ${stat.bg} p-4 sm:p-6 shadow-sm`}
           >
             <div className="flex justify-between items-start">
 
@@ -126,7 +128,7 @@ export default function AdminDashboard() {
                   {stat.label}
                 </p>
 
-                <p className={`text-4xl font-bold ${stat.textColor}`}>
+                <p className={`text-3xl sm:text-4xl font-bold ${stat.textColor}`}>
                   {stat.value}
                 </p>
 
@@ -135,7 +137,7 @@ export default function AdminDashboard() {
                 </span>
               </div>
 
-              <div className={`${stat.iconBg} ${stat.iconColor} w-12 h-12 rounded-xl flex items-center justify-center`}>
+              <div className={`${stat.iconBg} ${stat.iconColor} w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center`}>
                 {stat.icon}
               </div>
 
@@ -145,7 +147,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Recent Activities */}
-      <div className="mt-10 bg-white rounded-xl border p-6 shadow-sm">
+      <div className="mt-8 sm:mt-10 bg-white rounded-xl border p-4 sm:p-6 shadow-sm">
         <h2 className="text-lg font-bold text-gray-700 mb-4">
           Recent Activities
         </h2>
@@ -154,10 +156,12 @@ export default function AdminDashboard() {
           {recentActivities.map((activity, index) => (
             <li
               key={index}
-              className="flex justify-between text-sm border-b pb-2"
+              className="flex flex-col sm:flex-row sm:justify-between text-sm border-b pb-2 gap-1"
             >
               <span>{activity.message}</span>
-              <span className="text-gray-400">{activity.time}</span>
+              <span className="text-gray-400 text-xs sm:text-sm">
+                {activity.time}
+              </span>
             </li>
           ))}
         </ul>
