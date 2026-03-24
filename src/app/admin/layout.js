@@ -7,7 +7,7 @@ export default function AdminLayout({ children }) {
       <AdminSidebar />
 
       {/* MAIN CONTENT */}
-      <main className="lg:ml-64 px-4 sm:px-6 py-6 w-full overflow-x-hidden">
+      <main className="lg:ml-64 min-w-0 w-full overflow-x-hidden px-0 py-0">
         {children}
       </main>
 

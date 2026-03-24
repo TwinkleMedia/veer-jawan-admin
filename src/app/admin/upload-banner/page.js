@@ -88,7 +88,7 @@ export default function UploadBanner() {
   const deleteBanner = async (id) => {
     if (!confirm("Are you sure you want to delete this banner?")) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/banner/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/banner/${id}`, {
         method: "DELETE",
       });
       if (res.ok) {

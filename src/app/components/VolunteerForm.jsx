@@ -13,6 +13,28 @@ const sectionTitleCls =
 
 const API = process.env.NEXT_PUBLIC_API_URL;
 
+const EMPTY_FORM = {
+  fullName: "", dob: "", gender: "", email: "", mobile: "",
+  alternateMobile: "", address1: "", address2: "", city: "",
+  state: "", pincode: "", interests: [], skills: "",
+  availability: "", location: "", occupation: "",
+};
+
+const interestsList = [
+  "Event Management", "Fundraising", "Social Media Promotion",
+  "Field Work", "Administrative Support", "Awareness Campaign",
+  "Helping Martyrs' Families",
+];
+
+const indianStates = [
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
+  "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya",
+  "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim",
+  "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand",
+  "West Bengal", "Delhi", "Jammu & Kashmir", "Ladakh",
+];
+
 function SectionDivider({ title, icon }) {
   return (
     <div className={sectionTitleCls}>
@@ -23,8 +45,261 @@ function SectionDivider({ title, icon }) {
   );
 }
 
-// Mobile card for a single volunteer row
-function VolunteerCard({ v, i, onDelete }) {
+// ── Edit Modal ──────────────────────────────────────────────────────────────
+function EditModal({ volunteer, onClose, onSaved }) {
+  const [formData, setFormData] = useState({ ...EMPTY_FORM });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  // Populate form when volunteer changes
+  useEffect(() => {
+    if (!volunteer) return;
+    setFormData({
+      fullName: volunteer.fullName || "",
+      dob: volunteer.dob ? volunteer.dob.slice(0, 10) : "",
+      gender: volunteer.gender || "",
+      email: volunteer.email || "",
+      mobile: volunteer.mobile || "",
+      alternateMobile: volunteer.alternateMobile || "",
+      address1: volunteer.address1 || "",
+      address2: volunteer.address2 || "",
+      city: volunteer.city || "",
+      state: volunteer.state || "",
+      pincode: volunteer.pincode || "",
+      interests: volunteer.interests || [],
+      skills: volunteer.skills || "",
+      availability: volunteer.availability || "",
+      location: volunteer.location || "",
+      occupation: volunteer.occupation || "",
+    });
+    setError("");
+  }, [volunteer]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleCheckbox = (e) => {
+    const { value, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      interests: checked
+        ? [...prev.interests, value]
+        : prev.interests.filter((i) => i !== value),
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`${API}/api/volunteers/${volunteer._id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.success) {
+        onSaved();
+        onClose();
+      } else {
+        setError(data.message || "Update failed. Please try again.");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Server error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!volunteer) return null;
+
+  return (
+    // Backdrop
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4 py-6 overflow-y-auto"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-orange-100 overflow-hidden my-auto">
+
+        {/* Modal Header */}
+        <div className="px-6 py-5 bg-gradient-to-r from-orange-500 to-orange-400 flex items-center justify-between sticky top-0 z-10">
+          <div>
+            <h2 className="text-lg font-black text-white tracking-tight">Edit Volunteer</h2>
+            <p className="text-orange-100 text-xs mt-0.5 truncate max-w-xs">{volunteer.fullName}</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 text-white text-lg transition"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+
+        {error && (
+          <div className="mx-6 mt-4 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600 font-medium">
+            ⚠️ {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} noValidate className="overflow-y-auto max-h-[70vh]">
+
+          {/* PERSONAL INFO */}
+          <div className="px-6 py-6 border-b border-orange-50">
+            <SectionDivider title="Personal Info" icon="👤" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className={labelCls}>Full Name *</label>
+                <input type="text" name="fullName" value={formData.fullName}
+                  onChange={handleChange} required placeholder="Enter full name" className={inputCls} />
+              </div>
+              <div>
+                <label className={labelCls}>Date of Birth</label>
+                <input type="date" name="dob" value={formData.dob}
+                  onChange={handleChange} className={inputCls} />
+              </div>
+            </div>
+            <div className="mb-4">
+              <label className={labelCls}>Gender</label>
+              <div className="flex flex-wrap gap-4 mt-1">
+                {["Male", "Female", "Other"].map((g) => (
+                  <label key={g} className="flex items-center gap-2 cursor-pointer text-sm text-gray-700">
+                    <input type="radio" name="gender" value={g}
+                      checked={formData.gender === g} onChange={handleChange} className="accent-orange-500" />
+                    {g}
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className={labelCls}>Occupation</label>
+              <input type="text" name="occupation" value={formData.occupation}
+                onChange={handleChange} placeholder="e.g. Teacher, Engineer, Student" className={inputCls} />
+            </div>
+          </div>
+
+          {/* CONTACT */}
+          <div className="px-6 py-6 border-b border-orange-50">
+            <SectionDivider title="Contact Details" icon="📞" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className={labelCls}>Email *</label>
+                <input type="email" name="email" value={formData.email}
+                  onChange={handleChange} required placeholder="you@example.com" className={inputCls} />
+              </div>
+              <div>
+                <label className={labelCls}>Mobile *</label>
+                <input type="tel" name="mobile" value={formData.mobile}
+                  onChange={handleChange} required placeholder="+91 XXXXX XXXXX" className={inputCls} />
+              </div>
+            </div>
+            <div>
+              <label className={labelCls}>Alternate Mobile</label>
+              <input type="tel" name="alternateMobile" value={formData.alternateMobile}
+                onChange={handleChange} placeholder="Optional" className={inputCls} />
+            </div>
+          </div>
+
+          {/* ADDRESS */}
+          <div className="px-6 py-6 border-b border-orange-50">
+            <SectionDivider title="Address" icon="📍" />
+            <div className="mb-4">
+              <label className={labelCls}>Address Line 1</label>
+              <input type="text" name="address1" value={formData.address1}
+                onChange={handleChange} placeholder="House / Flat No., Street" className={inputCls} />
+            </div>
+            <div className="mb-4">
+              <label className={labelCls}>Address Line 2</label>
+              <input type="text" name="address2" value={formData.address2}
+                onChange={handleChange} placeholder="Landmark, Area (optional)" className={inputCls} />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className={labelCls}>City</label>
+                <input type="text" name="city" value={formData.city}
+                  onChange={handleChange} placeholder="City" className={inputCls} />
+              </div>
+              <div>
+                <label className={labelCls}>State</label>
+                <select name="state" value={formData.state} onChange={handleChange} className={inputCls}>
+                  <option value="">Select State</option>
+                  {indianStates.map((s) => <option key={s}>{s}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className={labelCls}>Pincode</label>
+                <input type="number" name="pincode" value={formData.pincode}
+                  onChange={handleChange} placeholder="6-digit PIN" maxLength={6} className={inputCls} />
+              </div>
+            </div>
+          </div>
+
+          {/* INTERESTS */}
+          <div className="px-6 py-6 border-b border-orange-50">
+            <SectionDivider title="Area of Interest" icon="🎯" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {interestsList.map((item) => (
+                <label key={item}
+                  className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition text-sm
+                    ${formData.interests.includes(item)
+                      ? "border-orange-300 bg-orange-50 text-orange-800 font-medium"
+                      : "border-gray-100 bg-gray-50 text-gray-600 hover:border-orange-200 hover:bg-orange-50/50"}`}>
+                  <input type="checkbox" value={item}
+                    checked={formData.interests.includes(item)}
+                    onChange={handleCheckbox} className="accent-orange-500 w-4 h-4 shrink-0" />
+                  {item}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* SKILLS */}
+          <div className="px-6 py-6">
+            <SectionDivider title="Skills" icon="⚡" />
+            <textarea name="skills" rows="3" value={formData.skills}
+              onChange={handleChange}
+              placeholder="Describe any relevant skills, languages spoken, or special expertise..."
+              className={inputCls} />
+          </div>
+
+          {/* FOOTER ACTIONS */}
+          <div className="sticky bottom-0 px-6 py-4 bg-orange-50 border-t border-orange-100 flex gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 py-3 bg-white hover:bg-gray-50 text-gray-600 font-bold rounded-xl transition text-sm border border-gray-200"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 py-3 bg-orange-500 hover:bg-orange-600 active:bg-orange-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-black rounded-xl transition text-sm tracking-wide shadow-md shadow-orange-200"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                  </svg>
+                  Saving...
+                </span>
+              ) : "✅ Save Changes"}
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ── Mobile Volunteer Card ──────────────────────────────────────────────────
+function VolunteerCard({ v, i, onDelete, onEdit }) {
   const [expanded, setExpanded] = useState(false);
   return (
     <div className="border border-orange-100 rounded-xl overflow-hidden">
@@ -70,12 +345,18 @@ function VolunteerCard({ v, i, onDelete }) {
               </div>
             </div>
           )}
-          <div className="col-span-2 mt-2">
+          <div className="col-span-2 mt-2 flex gap-2">
+            <button
+              onClick={() => onEdit(v)}
+              className="flex-1 py-2 bg-orange-50 hover:bg-orange-100 text-orange-600 font-semibold rounded-lg text-xs transition border border-orange-200"
+            >
+              ✏️ Edit
+            </button>
             <button
               onClick={() => onDelete(v._id)}
-              className="w-full py-2 bg-red-50 hover:bg-red-100 text-red-600 font-semibold rounded-lg text-xs transition border border-red-100"
+              className="flex-1 py-2 bg-red-50 hover:bg-red-100 text-red-600 font-semibold rounded-lg text-xs transition border border-red-100"
             >
-              🗑️ Delete Volunteer
+              🗑️ Delete
             </button>
           </div>
         </div>
@@ -84,34 +365,17 @@ function VolunteerCard({ v, i, onDelete }) {
   );
 }
 
+// ── Main Component ──────────────────────────────────────────────────────────
 export default function VolunteerForm() {
-  const [formData, setFormData] = useState({
-    fullName: "", dob: "", gender: "", email: "", mobile: "",
-    alternateMobile: "", address1: "", address2: "", city: "",
-    state: "", pincode: "", interests: [], skills: "",
-    availability: "", location: "", occupation: "",
-  });
-
+  const [formData, setFormData] = useState({ ...EMPTY_FORM });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [volunteers, setVolunteers] = useState([]);
   const [tableLoading, setTableLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  const interestsList = [
-    "Event Management", "Fundraising", "Social Media Promotion",
-    "Field Work", "Administrative Support", "Awareness Campaign",
-    "Helping Martyrs' Families",
-  ];
-
-  const indianStates = [
-    "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
-    "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka",
-    "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya",
-    "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim",
-    "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand",
-    "West Bengal", "Delhi", "Jammu & Kashmir", "Ladakh",
-  ];
+  // Edit modal state
+  const [editingVolunteer, setEditingVolunteer] = useState(null);
 
   const fetchVolunteers = async () => {
     setTableLoading(true);
@@ -128,7 +392,6 @@ export default function VolunteerForm() {
 
   useEffect(() => { fetchVolunteers(); }, []);
 
-  // Prevent horizontal scroll globally
   useEffect(() => {
     document.documentElement.style.overflowX = "hidden";
     document.body.style.overflowX = "hidden";
@@ -137,6 +400,16 @@ export default function VolunteerForm() {
       document.body.style.overflowX = "";
     };
   }, []);
+
+  // Lock body scroll when modal open
+  useEffect(() => {
+    if (editingVolunteer) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [editingVolunteer]);
 
   const deleteVolunteer = async (id) => {
     if (!confirm("Are you sure you want to delete this volunteer?")) return;
@@ -180,12 +453,7 @@ export default function VolunteerForm() {
       const data = await res.json();
       if (data.success) {
         setSubmitted(true);
-        setFormData({
-          fullName: "", dob: "", gender: "", email: "", mobile: "",
-          alternateMobile: "", address1: "", address2: "", city: "",
-          state: "", pincode: "", interests: [], skills: "",
-          availability: "", location: "", occupation: "",
-        });
+        setFormData({ ...EMPTY_FORM });
         fetchVolunteers();
       } else {
         alert("Something went wrong. Please try again.");
@@ -227,6 +495,15 @@ export default function VolunteerForm() {
 
   return (
     <div className="min-h-screen bg-orange-50/60 py-8 px-4 sm:py-10 overflow-x-hidden">
+
+      {/* Edit Modal */}
+      {editingVolunteer && (
+        <EditModal
+          volunteer={editingVolunteer}
+          onClose={() => setEditingVolunteer(null)}
+          onSaved={fetchVolunteers}
+        />
+      )}
 
       {/* Header */}
       <div className="w-full max-w-2xl mx-auto text-center mb-8 px-2">
@@ -340,7 +617,7 @@ export default function VolunteerForm() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {interestsList.map((item) => (
                 <label key={item}
-                  className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition text-sm break-wordsU
+                  className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition text-sm break-words
                     ${formData.interests.includes(item)
                       ? "border-orange-300 bg-orange-50 text-orange-800 font-medium"
                       : "border-gray-100 bg-gray-50 text-gray-600 hover:border-orange-200 hover:bg-orange-50/50"}`}>
@@ -433,7 +710,7 @@ export default function VolunteerForm() {
               <table className="w-full text-sm min-w-[900px]">
                 <thead>
                   <tr className="bg-orange-50 border-b border-orange-100">
-                    {["#", "Name", "Gender", "Email", "Mobile", "City", "State", "Occupation", "Interests", "Registered On", "Action"].map((h) => (
+                    {["#", "Name", "Gender", "Email", "Mobile", "City", "State", "Occupation", "Interests", "Registered On", "Actions"].map((h) => (
                       <th key={h}
                         className="px-4 py-3 text-left text-xs font-black uppercase tracking-widest text-orange-400 whitespace-nowrap">
                         {h}
@@ -480,12 +757,20 @@ export default function VolunteerForm() {
                         })}
                       </td>
                       <td className="px-4 py-3.5">
-                        <button
-                          onClick={() => deleteVolunteer(v._id)}
-                          className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-semibold rounded-lg text-xs transition border border-red-100 whitespace-nowrap"
-                        >
-                          🗑️ Delete
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setEditingVolunteer(v)}
+                            className="px-3 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-600 font-semibold rounded-lg text-xs transition border border-orange-200 whitespace-nowrap"
+                          >
+                            ✏️ Edit
+                          </button>
+                          <button
+                            onClick={() => deleteVolunteer(v._id)}
+                            className="px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 font-semibold rounded-lg text-xs transition border border-red-100 whitespace-nowrap"
+                          >
+                            🗑️ Delete
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -496,7 +781,13 @@ export default function VolunteerForm() {
             {/* ── Mobile Cards (< md) ── */}
             <div className="flex flex-col gap-2 p-4 md:hidden">
               {filtered.map((v, i) => (
-                <VolunteerCard key={v._id} v={v} i={i} onDelete={deleteVolunteer} />
+                <VolunteerCard
+                  key={v._id}
+                  v={v}
+                  i={i}
+                  onDelete={deleteVolunteer}
+                  onEdit={setEditingVolunteer}
+                />
               ))}
             </div>
           </>
