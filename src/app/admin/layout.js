@@ -1,16 +1,13 @@
-import AdminSidebar from "@/app/components/AdminSidebar";
+import AdminSidebar from "@/app/components/AdminSidebar"; // adjust path as needed
 
 export default function AdminLayout({ children }) {
   return (
     <div className="min-h-screen bg-gray-50">
-
       <AdminSidebar />
-
-      {/* MAIN CONTENT */}
-      <main className="lg:ml-64 min-w-0 w-full overflow-x-hidden px-0 py-0">
+      {/* lg:ml-64 matches the sidebar w-64 on desktop */}
+      <main className="lg:ml-64 min-h-screen overflow-x-hidden">
         {children}
       </main>
-
     </div>
   );
 }

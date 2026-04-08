@@ -30,7 +30,7 @@ const navItems = [
   },
 
   {
-    name: "Volunteers Management",
+    name: "Membership Management",
     href: "/admin/volunteers",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
@@ -43,7 +43,7 @@ const navItems = [
 
   {
     name: "Donation Management",
-    href: "/admin/membershipPage",
+    href: "/admin/membershipPages",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
         <path d="M12 1v22"/>
@@ -65,7 +65,7 @@ const navItems = [
 
   {
     name: "Veer Nari / Parent Membership",
-    href: "/admin/memberships",
+    href: "/admin/veernaripage",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
         <circle cx="12" cy="7" r="4"/>
@@ -75,7 +75,7 @@ const navItems = [
   },
 
   {
-    name: "Photo Gallery",
+    name: "Gallery",
     href: "/admin/gallery",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
