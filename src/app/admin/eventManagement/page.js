@@ -145,9 +145,13 @@ function ViewModal({ event, onClose }) {
   return (
     <Modal title={`View Event — ${event.title}`} onClose={onClose} maxWidth="max-w-xl">
       <div className="space-y-4">
-        {event.imageUrl && (
-          <img src={event.imageUrl} alt={event.title}
-            className="w-full h-48 sm:h-60 object-cover rounded-xl border border-gray-100" />
+        {/* ✅ FIX: was event.imageUrl — now correctly checks event.image?.url */}
+        {event.image?.url && (
+          <img
+            src={event.image.url}
+            alt={event.title}
+            className="w-full h-48 sm:h-60 object-cover rounded-xl border border-gray-100"
+          />
         )}
         <h3 className="text-lg font-black text-[#1a2744]">{event.title}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -248,7 +252,8 @@ function EditModal({ event, onClose, onSaved }) {
     description: event.description || "",
   });
   const [imageFile,    setImageFile]    = useState(null);
-  const [imagePreview, setImagePreview] = useState(event.imageUrl || null);
+  // ✅ FIX: was event.imageUrl — now correctly reads event.image?.url
+  const [imagePreview, setImagePreview] = useState(event.image?.url || null);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
   const fileRef = useRef(null);
@@ -656,8 +661,9 @@ function EventsTable({ events, loading, error, onRefresh, onView, onEdit, onDele
                     {/* Event */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3 min-w-0">
-                        {event.imageUrl ? (
-                          <img src={event.imageUrl} alt={event.title}
+                        {/* ✅ Already correct in original — event.image.url */}
+                        {event.image?.url ? (
+                          <img src={event.image.url} alt={event.title}
                             className="w-10 h-10 rounded-lg object-cover shrink-0 border border-gray-100" />
                         ) : (
                           <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center shrink-0 text-gray-400">
@@ -718,10 +724,13 @@ function EventsTable({ events, loading, error, onRefresh, onView, onEdit, onDele
           <div className="md:hidden divide-y divide-gray-100">
             {paginated.map((event) => (
               <div key={event._id} className="p-3 sm:p-4 flex gap-3">
-                {/* Image */}
-                {event.imageUrl ? (
-                  <img src={event.imageUrl} alt={event.title}
-                    className="w-16 h-16 rounded-xl object-cover shrink-0 border border-gray-100" />
+                {/* ✅ FIX: was event.imageUrl — now correctly reads event.image?.url */}
+                {event.image?.url ? (
+                  <img
+                    src={event.image.url}
+                    alt={event.title}
+                    className="w-16 h-16 rounded-xl object-cover shrink-0 border border-gray-100"
+                  />
                 ) : (
                   <div className="w-16 h-16 rounded-xl bg-gray-100 flex items-center justify-center shrink-0 text-gray-400">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-6 h-6">

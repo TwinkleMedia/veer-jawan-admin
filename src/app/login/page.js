@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import bgimage from "./adminbackground.jpg";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function Login() {
   const router = useRouter();
@@ -16,7 +17,7 @@ export default function Login() {
   setError("");
 
   try {
-    const res = await fetch("http://localhost:5000/api/auth/login", {
+    const res = await fetch(`${API_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include", // important for cookies

@@ -43,7 +43,7 @@ const navItems = [
 
   {
     name: "Donation Management",
-    href: "/admin/membershipPages",
+    href: "/admin/DonationManagement",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
         <path d="M12 1v22"/>
