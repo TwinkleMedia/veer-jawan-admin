@@ -85,7 +85,6 @@ const downloadFile = async (url, filename) => {
     window.URL.revokeObjectURL(objectUrl);
   } catch (err) {
     console.error("Download error:", err);
-    // Fallback: open in new tab
     window.open(url, "_blank", "noreferrer");
   }
 };
@@ -172,15 +171,16 @@ const IconPlus = () => (
   </svg>
 );
 
-const IconDownload = () => (
-  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
-    <path d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-  </svg>
-);
-
 const IconPdf = () => (
   <svg className="w-8 h-8 text-red-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+  </svg>
+);
+
+// ── YouTube Icon ──────────────────────────────────────────────────────────────
+const IconYoutube = () => (
+  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
   </svg>
 );
 
@@ -216,14 +216,12 @@ function SectionTitle({ children }) {
 
 function ImageUploadBox({ label, preview, downloadUrl, inputRef, onChange, onClear, isChanged }) {
   const safeFilename = label.toLowerCase().replace(/\s+/g, "-");
-
   const isPdf =
     (downloadUrl && downloadUrl.toLowerCase().includes(".pdf")) ||
     (preview && preview.startsWith("data:application/pdf"));
 
   return (
     <div className="flex flex-col items-center gap-2">
-      {/* Label Row */}
       <div className="flex items-center gap-1.5 w-full justify-center flex-wrap">
         <span className="text-[10px] font-black tracking-widest uppercase text-[#1a2744] text-center leading-tight">
           {label}
@@ -239,8 +237,6 @@ function ImageUploadBox({ label, preview, downloadUrl, inputRef, onChange, onCle
           </span>
         )}
       </div>
-
-      {/* Drop Zone */}
       <div
         className="relative w-full rounded-2xl overflow-hidden transition group"
         style={{
@@ -266,11 +262,8 @@ function ImageUploadBox({ label, preview, downloadUrl, inputRef, onChange, onCle
             <span className="text-[10px] font-semibold sm:hidden">Tap</span>
           </div>
         )}
-
-        {/* Hover overlay — Download + Change when file exists */}
         {preview && (
           <div className="absolute inset-0 bg-black/55 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-            {/* Download — only if real server URL and not a newly staged file */}
             {downloadUrl && !isChanged && (
               <button
                 type="button"
@@ -286,7 +279,6 @@ function ImageUploadBox({ label, preview, downloadUrl, inputRef, onChange, onCle
                 <span className="text-[9px] font-bold uppercase tracking-wider">Download</span>
               </button>
             )}
-            {/* Change */}
             <button
               type="button"
               onClick={(e) => { e.stopPropagation(); inputRef.current?.click(); }}
@@ -303,10 +295,7 @@ function ImageUploadBox({ label, preview, downloadUrl, inputRef, onChange, onCle
           </div>
         )}
       </div>
-
-      {/* Action Buttons Below */}
       <div className="flex gap-1.5 w-full">
-        {/* Download button — visible below box when server file exists and no new file staged */}
         {downloadUrl && !isChanged && (
           <button
             type="button"
@@ -319,8 +308,6 @@ function ImageUploadBox({ label, preview, downloadUrl, inputRef, onChange, onCle
             Download
           </button>
         )}
-
-        {/* Upload / Change */}
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
@@ -328,8 +315,6 @@ function ImageUploadBox({ label, preview, downloadUrl, inputRef, onChange, onCle
         >
           {preview ? "Change" : "Upload"}
         </button>
-
-        {/* Reset — only when user has staged a new file */}
         {isChanged && (
           <button
             type="button"
@@ -340,7 +325,6 @@ function ImageUploadBox({ label, preview, downloadUrl, inputRef, onChange, onCle
           </button>
         )}
       </div>
-
       <input
         ref={inputRef}
         type="file"
@@ -388,7 +372,9 @@ function ViewModal({ member, onClose }) {
   const Row = ({ label, value }) =>
     value ? (
       <div className="flex flex-col xs:flex-row gap-0.5 xs:gap-3 py-2.5 border-b border-gray-100 last:border-0">
-        <span className="text-[10px] font-black tracking-widest uppercase text-gray-400 xs:w-40 xs:shrink-0 leading-none pt-0.5">{label}</span>
+        <span className="text-[10px] font-black tracking-widest uppercase text-gray-400 xs:w-40 xs:shrink-0 leading-none pt-0.5">
+          {label}
+        </span>
         <span className="text-sm text-gray-800 break-words flex-1 leading-snug">{value}</span>
       </div>
     ) : null;
@@ -397,12 +383,12 @@ function ViewModal({ member, onClose }) {
 
   return (
     <Modal title={`${member.fullName}`} onClose={onClose} maxWidth="max-w-2xl">
-      {/* Document images with download buttons */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
+      {/* Document images */}
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
         {[
-          { label: "Photo", url: member.photo?.url, filename: "passport-photo" },
-          { label: "Aadhar", url: member.aadharCard?.url, filename: "aadhar-card" },
-          { label: "Soldier ID", url: member.soldierIdCard?.url, filename: "soldier-id" },
+          { label: "Passport Photo", url: member.passportPhoto?.url, filename: "passport-photo" },
+          { label: "Aadhaar Card", url: member.aadharCard?.url, filename: "aadhar-card" },
+          { label: "PAN Card", url: member.panCard?.url, filename: "pan-card" },
         ].map(({ label, url, filename }) =>
           url ? (
             <div key={label} className="text-center space-y-1.5">
@@ -445,8 +431,8 @@ function ViewModal({ member, onClose }) {
       <Row label="Full Name" value={member.fullName} />
       <Row label="Date of Birth" value={fmt(member.dob)} />
 
-      <SectionTitle>Address</SectionTitle>
-      <Row label="Address" value={member.address} />
+      <SectionTitle>Address & Location</SectionTitle>
+      <Row label="Full Address" value={member.address} />
       <Row label="Pincode" value={member.pincode} />
       <Row label="District" value={member.district} />
       <Row label="State" value={member.state} />
@@ -465,6 +451,27 @@ function ViewModal({ member, onClose }) {
       <Row label="Is Associated" value={member.isAssociated} />
       <Row label="Organization Name" value={member.organizationName} />
       <Row label="Brief Description" value={member.briefDescription} />
+
+      {/* ── ADDED: YouTube Link Section ── */}
+      {member.youtubeLink && (
+        <>
+          <SectionTitle>Media</SectionTitle>
+          <div className="flex flex-col xs:flex-row gap-0.5 xs:gap-3 py-2.5 border-b border-gray-100">
+            <span className="text-[10px] font-black tracking-widest uppercase text-gray-400 xs:w-40 xs:shrink-0 leading-none pt-0.5">
+              YouTube Link
+            </span>
+            <a
+              href={member.youtubeLink}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-2 text-sm text-red-600 hover:text-red-700 underline underline-offset-2 break-all flex-1 leading-snug font-medium"
+            >
+              <span className="text-red-500 shrink-0"><IconYoutube /></span>
+              {member.youtubeLink}
+            </a>
+          </div>
+        </>
+      )}
 
       <SectionTitle>Timestamps</SectionTitle>
       <Row label="Created At" value={member.createdAt ? new Date(member.createdAt).toLocaleString("en-IN") : ""} />
@@ -504,18 +511,19 @@ function EditModal({ member, onClose, onSaved }) {
     isAssociated: member.isAssociated || "",
     organizationName: member.organizationName || "",
     briefDescription: member.briefDescription || "",
+    youtubeLink: member.youtubeLink || "", // ← ADDED
   });
 
-  const [photoFile, setPhotoFile] = useState(null);
-  const [photoPreview, setPhotoPreview] = useState(member.photo?.url || null);
   const [aadharFile, setAadharFile] = useState(null);
   const [aadharPreview, setAadharPreview] = useState(member.aadharCard?.url || null);
-  const [soldierFile, setSoldierFile] = useState(null);
-  const [soldierPreview, setSoldierPreview] = useState(member.soldierIdCard?.url || null);
+  const [panFile, setPanFile] = useState(null);
+  const [panPreview, setPanPreview] = useState(member.panCard?.url || null);
+  const [passportFile, setPassportFile] = useState(null);
+  const [passportPreview, setPassportPreview] = useState(member.passportPhoto?.url || null);
 
-  const photoRef = useRef(null);
   const aadharRef = useRef(null);
-  const soldierRef = useRef(null);
+  const panRef = useRef(null);
+  const passportRef = useRef(null);
 
   const makeFileHandler = (setFile, setPreview) => (e) => {
     const file = e.target.files[0];
@@ -535,10 +543,13 @@ function EditModal({ member, onClose, onSaved }) {
     setLoading(true);
     try {
       const payload = { ...form };
-      if (photoFile) payload.photo = await toBase64(photoFile);
       if (aadharFile) payload.aadharCard = await toBase64(aadharFile);
-      if (soldierFile) payload.soldierIdCard = await toBase64(soldierFile);
-      const result = await fetcher(`/api/membershipAdmin/${member._id}`, { method: "PUT", body: JSON.stringify(payload) });
+      if (panFile) payload.panCard = await toBase64(panFile);
+      if (passportFile) payload.passportPhoto = await toBase64(passportFile);
+      const result = await fetcher(`/api/membershipAdmin/${member._id}`, {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      });
       onSaved(result.data);
       onClose();
     } catch (err) {
@@ -552,49 +563,49 @@ function EditModal({ member, onClose, onSaved }) {
     <Modal title={`Edit — ${member.membershipNumber}`} onClose={onClose} maxWidth="max-w-2xl">
       <SectionTitle>Basic Information</SectionTitle>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+        <Field label="Full Name" required className="sm:col-span-2">
+          <input className={inputCls} value={form.fullName} onChange={(e) => set("fullName", e.target.value)} />
+        </Field>
         <Field label="Membership Number" required>
           <input className={inputCls} value={form.membershipNumber} onChange={(e) => set("membershipNumber", e.target.value)} />
         </Field>
         <Field label="Date" required>
           <input type="date" className={inputCls} value={form.date} onChange={(e) => set("date", e.target.value)} />
         </Field>
-        <Field label="Full Name" required>
-          <input className={inputCls} value={form.fullName} onChange={(e) => set("fullName", e.target.value)} />
-        </Field>
         <Field label="Date of Birth" required>
           <input type="date" className={inputCls} value={form.dob} onChange={(e) => set("dob", e.target.value)} />
         </Field>
       </div>
 
-      <SectionTitle>Address</SectionTitle>
+      <SectionTitle>Address & Location</SectionTitle>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-        <Field label="Address" required className="sm:col-span-2">
+        <Field label="District" required>
+          <input className={inputCls} value={form.district} onChange={(e) => set("district", e.target.value)} />
+        </Field>
+        <Field label="State" required>
+          <select className={inputCls} value={form.state} onChange={(e) => set("state", e.target.value)}>
+            <option value="">Select State / UT</option>
+            {INDIAN_STATES.map((s) => (<option key={s}>{s}</option>))}
+          </select>
+        </Field>
+        <Field label="Permanent Full Address" required className="sm:col-span-2">
           <textarea className={`${inputCls} resize-y min-h-[80px]`} value={form.address} onChange={(e) => set("address", e.target.value)} />
         </Field>
         <Field label="Pincode" required>
           <input className={inputCls} value={form.pincode} onChange={(e) => set("pincode", e.target.value)} />
         </Field>
-        <Field label="District" required>
-          <input className={inputCls} value={form.district} onChange={(e) => set("district", e.target.value)} />
-        </Field>
-        <Field label="State" required className="sm:col-span-2">
-          <select className={inputCls} value={form.state} onChange={(e) => set("state", e.target.value)}>
-            <option value="">Select State / UT</option>
-            {INDIAN_STATES.map((s) => <option key={s}>{s}</option>)}
-          </select>
-        </Field>
       </div>
 
       <SectionTitle>Contact</SectionTitle>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-        <Field label="Mobile 1" required>
+        <Field label="Email Address">
+          <input type="email" className={inputCls} value={form.email} onChange={(e) => set("email", e.target.value)} />
+        </Field>
+        <Field label="Mobile Number 1" required>
           <input type="tel" className={inputCls} value={form.mobile1} onChange={(e) => set("mobile1", e.target.value)} />
         </Field>
-        <Field label="Mobile 2">
+        <Field label="Mobile Number 2">
           <input type="tel" className={inputCls} value={form.mobile2} onChange={(e) => set("mobile2", e.target.value)} />
-        </Field>
-        <Field label="Email" className="sm:col-span-2">
-          <input type="email" className={inputCls} value={form.email} onChange={(e) => set("email", e.target.value)} />
         </Field>
       </div>
 
@@ -603,7 +614,7 @@ function EditModal({ member, onClose, onSaved }) {
         <Field label="Occupation">
           <input className={inputCls} value={form.occupation} onChange={(e) => set("occupation", e.target.value)} />
         </Field>
-        <Field label="Education">
+        <Field label="Education Qualification">
           <input className={inputCls} value={form.education} onChange={(e) => set("education", e.target.value)} />
         </Field>
         <Field label="Marital Status">
@@ -613,52 +624,82 @@ function EditModal({ member, onClose, onSaved }) {
             <option>Unmarried</option>
           </select>
         </Field>
-        <Field label="Is Associated">
+        <Field label="Associated with Social Org?">
           <select className={inputCls} value={form.isAssociated} onChange={(e) => set("isAssociated", e.target.value)}>
             <option value="">Select</option>
             <option>Yes</option>
             <option>No</option>
           </select>
         </Field>
-        <Field label="Organization Name" className="sm:col-span-2">
-          <input className={inputCls} value={form.organizationName} onChange={(e) => set("organizationName", e.target.value)} />
-        </Field>
-        <Field label="Brief Description" className="sm:col-span-2">
+        {form.isAssociated === "Yes" && (
+          <Field label="Which Organization?" className="sm:col-span-2">
+            <input className={inputCls} value={form.organizationName} onChange={(e) => set("organizationName", e.target.value)} />
+          </Field>
+        )}
+        <Field label="Brief Description / Details" className="sm:col-span-2">
           <textarea className={`${inputCls} resize-y min-h-[80px]`} value={form.briefDescription} onChange={(e) => set("briefDescription", e.target.value)} />
         </Field>
       </div>
 
-      <SectionTitle>Document Images</SectionTitle>
+      {/* ── ADDED: YouTube Link in Edit Modal ── */}
+      <SectionTitle>Media</SectionTitle>
+      <div className="grid grid-cols-1 gap-3 sm:gap-4">
+        <Field label="YouTube Video Link">
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-red-500 pointer-events-none">
+              <IconYoutube />
+            </span>
+            <input
+              type="url"
+              className={`${inputCls} pl-9`}
+              placeholder="https://www.youtube.com/watch?v=..."
+              value={form.youtubeLink}
+              onChange={(e) => set("youtubeLink", e.target.value)}
+            />
+          </div>
+          {form.youtubeLink && (
+            <a
+              href={form.youtubeLink}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-red-600 hover:text-red-700 underline underline-offset-2 mt-1"
+            >
+              <IconYoutube /> Preview link
+            </a>
+          )}
+        </Field>
+      </div>
+
+      <SectionTitle>Required Attachments</SectionTitle>
       <p className="text-xs text-gray-400 mb-4">
         Click <strong>Download</strong> to save existing files. Upload a new one to replace.
       </p>
-      <div className="grid grid-cols-3 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4">
         <ImageUploadBox
-          label="Photo"
-          preview={photoPreview}
-          downloadUrl={member.photo?.url}
-          inputRef={photoRef}
-          isChanged={!!photoFile}
-          onChange={makeFileHandler(setPhotoFile, setPhotoPreview)}
-          onClear={() => { setPhotoFile(null); setPhotoPreview(member.photo?.url || null); if (photoRef.current) photoRef.current.value = ""; }}
+          label="Passport Photo"
+          preview={passportPreview}
+          downloadUrl={member.passportPhoto?.url}
+          inputRef={passportRef}
+          isChanged={!!passportFile}
+          onChange={makeFileHandler(setPassportFile, setPassportPreview)}
+          onClear={() => {
+            setPassportFile(null);
+            setPassportPreview(member.passportPhoto?.url || null);
+            if (passportRef.current) passportRef.current.value = "";
+          }}
         />
         <ImageUploadBox
-          label="Aadhar"
-          preview={aadharPreview}
-          downloadUrl={member.aadharCard?.url}
-          inputRef={aadharRef}
-          isChanged={!!aadharFile}
-          onChange={makeFileHandler(setAadharFile, setAadharPreview)}
-          onClear={() => { setAadharFile(null); setAadharPreview(member.aadharCard?.url || null); if (aadharRef.current) aadharRef.current.value = ""; }}
-        />
-        <ImageUploadBox
-          label="Soldier ID"
-          preview={soldierPreview}
-          downloadUrl={member.soldierIdCard?.url}
-          inputRef={soldierRef}
-          isChanged={!!soldierFile}
-          onChange={makeFileHandler(setSoldierFile, setSoldierPreview)}
-          onClear={() => { setSoldierFile(null); setSoldierPreview(member.soldierIdCard?.url || null); if (soldierRef.current) soldierRef.current.value = ""; }}
+          label="PAN Card"
+          preview={panPreview}
+          downloadUrl={member.panCard?.url}
+          inputRef={panRef}
+          isChanged={!!panFile}
+          onChange={makeFileHandler(setPanFile, setPanPreview)}
+          onClear={() => {
+            setPanFile(null);
+            setPanPreview(member.panCard?.url || null);
+            if (panRef.current) panRef.current.value = "";
+          }}
         />
       </div>
 
@@ -675,7 +716,11 @@ function EditModal({ member, onClose, onSaved }) {
         <button onClick={onClose} className="flex-1 px-4 py-3 rounded-2xl border border-gray-200 text-sm font-bold text-gray-500 hover:bg-gray-50 transition min-h-[48px]">
           Cancel
         </button>
-        <button onClick={handleSave} disabled={loading} className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-[#293C86] text-white text-sm font-bold hover:bg-[#1a2744] transition disabled:opacity-60 min-h-[48px]">
+        <button
+          onClick={handleSave}
+          disabled={loading}
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-[#293C86] text-white text-sm font-bold hover:bg-[#1a2744] transition disabled:opacity-60 min-h-[48px]"
+        >
           {loading && <IconSpinner />} Save Changes
         </button>
       </div>
@@ -723,7 +768,11 @@ function DeleteModal({ member, onClose, onDeleted }) {
           <button onClick={onClose} className="flex-1 px-4 py-3 rounded-2xl border border-gray-200 text-sm font-bold text-gray-500 hover:bg-gray-50 transition min-h-[48px]">
             Cancel
           </button>
-          <button onClick={handleDelete} disabled={loading} className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-red-600 text-white text-sm font-bold hover:bg-red-700 transition disabled:opacity-60 min-h-[48px]">
+          <button
+            onClick={handleDelete}
+            disabled={loading}
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-red-600 text-white text-sm font-bold hover:bg-red-700 transition disabled:opacity-60 min-h-[48px]"
+          >
             {loading ? <IconSpinner /> : <IconDelete />} Yes, Delete
           </button>
         </div>
@@ -740,9 +789,9 @@ function DocBadges({ member }) {
   return (
     <div className="flex gap-1">
       {[
-        { url: member.photo?.url, label: "P", title: "Passport Photo", filename: "passport-photo" },
-        { url: member.aadharCard?.url, label: "A", title: "Aadhar Card", filename: "aadhar-card" },
-        { url: member.soldierIdCard?.url, label: "S", title: "Soldier ID", filename: "soldier-id" },
+        { url: member.aadharCard?.url, label: "A", title: "Aadhaar Card", filename: "aadhar-card" },
+        { url: member.passportPhoto?.url, label: "PP", title: "Passport Photo", filename: "passport-photo" },
+        { url: member.panCard?.url, label: "P", title: "PAN Card", filename: "pan-card" },
       ].map(({ url, label, title, filename }) =>
         url ? (
           <button
@@ -764,6 +813,20 @@ function DocBadges({ member }) {
           </span>
         ),
       )}
+      {/* ── ADDED: YouTube badge in table row ── */}
+      {member.youtubeLink && (
+        <a
+          href={member.youtubeLink}
+          target="_blank"
+          rel="noreferrer"
+          title="Watch on YouTube"
+          className="w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600 transition shrink-0"
+        >
+          <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+          </svg>
+        </a>
+      )}
     </div>
   );
 }
@@ -773,40 +836,41 @@ function DocBadges({ member }) {
 // ══════════════════════════════════════════════════════════════════════════════
 
 const EMPTY_FORM = {
+  fullName: "",
   membershipNumber: "",
   date: "",
-  fullName: "",
   dob: "",
-  address: "",
-  pincode: "",
   district: "",
   state: "",
-  mobile1: "",
-  mobile2: "",
+  address: "",
   email: "",
   occupation: "",
+  mobile1: "",
+  mobile2: "",
+  pincode: "",
   education: "",
   maritalStatus: "",
   isAssociated: "",
   organizationName: "",
   briefDescription: "",
+  youtubeLink: "", // ← ADDED
 };
 
 function RegistrationForm({ onCreated, collapsed, onToggle }) {
   const [form, setForm] = useState(EMPTY_FORM);
-  const [photoFile, setPhotoFile] = useState(null);
-  const [photoPreview, setPhotoPreview] = useState(null);
   const [aadharFile, setAadharFile] = useState(null);
   const [aadharPreview, setAadharPreview] = useState(null);
-  const [soldierFile, setSoldierFile] = useState(null);
-  const [soldierPreview, setSoldierPreview] = useState(null);
+  const [panFile, setPanFile] = useState(null);
+  const [panPreview, setPanPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [passportFile, setPassportFile] = useState(null);
+  const [passportPreview, setPassportPreview] = useState(null);
 
-  const photoRef = useRef(null);
+  const passportRef = useRef(null);
   const aadharRef = useRef(null);
-  const soldierRef = useRef(null);
+  const panRef = useRef(null);
 
   const set = (k, v) => setForm((p) => ({ ...p, [k]: v }));
 
@@ -825,21 +889,27 @@ function RegistrationForm({ onCreated, collapsed, onToggle }) {
     setSuccess("");
     setLoading(true);
     try {
-      const payload = { ...form };
-      if (photoFile) payload.photo = await toBase64(photoFile);
+      const payload = { ...form }; // youtubeLink is already inside form
       if (aadharFile) payload.aadharCard = await toBase64(aadharFile);
-      if (soldierFile) payload.soldierIdCard = await toBase64(soldierFile);
+      if (panFile) payload.panCard = await toBase64(panFile);
+      if (passportFile) payload.passportPhoto = await toBase64(passportFile);
 
-      const result = await fetcher("/api/membershipAdmin", { method: "POST", body: JSON.stringify(payload) });
+      const result = await fetcher("/api/membershipAdmin", {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
 
       setSuccess("Member registered successfully!");
       setForm(EMPTY_FORM);
-      setPhotoFile(null); setPhotoPreview(null);
-      setAadharFile(null); setAadharPreview(null);
-      setSoldierFile(null); setSoldierPreview(null);
-      if (photoRef.current) photoRef.current.value = "";
+      setAadharFile(null);
+      setAadharPreview(null);
+      setPanFile(null);
+      setPanPreview(null);
+      setPassportFile(null);
+      setPassportPreview(null);
       if (aadharRef.current) aadharRef.current.value = "";
-      if (soldierRef.current) soldierRef.current.value = "";
+      if (panRef.current) panRef.current.value = "";
+      if (passportRef.current) passportRef.current.value = "";
       onCreated(result.data);
     } catch (err) {
       setError(err.message);
@@ -850,6 +920,7 @@ function RegistrationForm({ onCreated, collapsed, onToggle }) {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-4 sm:mb-6">
+      {/* Collapsible Header */}
       <button
         type="button"
         onClick={onToggle}
@@ -863,7 +934,9 @@ function RegistrationForm({ onCreated, collapsed, onToggle }) {
           </div>
           <div className="text-left">
             <h2 className="text-white font-bold text-sm sm:text-base tracking-wide">New Member Registration</h2>
-            <p className="text-white/60 text-xs mt-0.5">{collapsed ? "Tap to expand form" : "Fill all required fields marked with *"}</p>
+            <p className="text-white/60 text-xs mt-0.5">
+              {collapsed ? "Tap to expand form" : "Fill all required fields marked with *"}
+            </p>
           </div>
         </div>
         <span className={`text-white/70 transition-transform duration-200 ${collapsed ? "" : "rotate-180"}`}>
@@ -873,60 +946,89 @@ function RegistrationForm({ onCreated, collapsed, onToggle }) {
 
       {!collapsed && (
         <form onSubmit={handleSubmit} className="p-4 sm:p-6">
+          {/* ── Section 01: Basic Info ── */}
           <SectionTitle>01 — Basic Information</SectionTitle>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <Field label="Member Full Name" required className="col-span-full">
+              <input
+                className={inputCls}
+                placeholder="Enter full name as per official documents"
+                value={form.fullName}
+                onChange={(e) => set("fullName", e.target.value)}
+                required
+              />
+            </Field>
             <Field label="Membership Number" required>
-              <input className={inputCls} placeholder="e.g. MEM-0001" value={form.membershipNumber} onChange={(e) => set("membershipNumber", e.target.value)} required />
+              <input
+                className={inputCls}
+                placeholder="e.g. MEM-0001"
+                value={form.membershipNumber}
+                onChange={(e) => set("membershipNumber", e.target.value)}
+                required
+              />
             </Field>
             <Field label="Date" required>
               <input type="date" className={inputCls} value={form.date} onChange={(e) => set("date", e.target.value)} required />
-            </Field>
-            <Field label="Full Name" required>
-              <input className={inputCls} placeholder="Enter full name" value={form.fullName} onChange={(e) => set("fullName", e.target.value)} required />
             </Field>
             <Field label="Date of Birth" required>
               <input type="date" className={inputCls} value={form.dob} onChange={(e) => set("dob", e.target.value)} required />
             </Field>
           </div>
 
+          {/* ── Section 02: Address ── */}
           <SectionTitle>02 — Address Details</SectionTitle>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <Field label="Address" required className="col-span-full">
-              <textarea className={`${inputCls} resize-y min-h-[80px]`} placeholder="Full address" value={form.address} onChange={(e) => set("address", e.target.value)} required />
-            </Field>
-            <Field label="Pincode" required>
-              <input className={inputCls} placeholder="6-digit pincode" maxLength={6} value={form.pincode} onChange={(e) => set("pincode", e.target.value)} required />
-            </Field>
             <Field label="District" required>
               <input className={inputCls} placeholder="District" value={form.district} onChange={(e) => set("district", e.target.value)} required />
             </Field>
-            <Field label="State" required className="col-span-full">
+            <Field label="State" required>
               <select className={inputCls} value={form.state} onChange={(e) => set("state", e.target.value)} required>
                 <option value="">Select State / UT</option>
-                {INDIAN_STATES.map((s) => <option key={s}>{s}</option>)}
+                {INDIAN_STATES.map((s) => (<option key={s}>{s}</option>))}
               </select>
             </Field>
+            <Field label="Permanent Full Address" required className="col-span-full">
+              <textarea
+                className={`${inputCls} resize-y min-h-[88px]`}
+                placeholder="House / Flat No., Street, Village / Town, City…"
+                value={form.address}
+                onChange={(e) => set("address", e.target.value)}
+                required
+              />
+            </Field>
+            <Field label="Pincode" required>
+              <input
+                className={inputCls}
+                placeholder="6-digit pincode"
+                maxLength={6}
+                value={form.pincode}
+                onChange={(e) => set("pincode", e.target.value)}
+                required
+              />
+            </Field>
           </div>
 
+          {/* ── Section 03: Contact ── */}
           <SectionTitle>03 — Contact Details</SectionTitle>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <Field label="Mobile 1" required>
-              <input type="tel" className={inputCls} placeholder="Primary mobile" value={form.mobile1} onChange={(e) => set("mobile1", e.target.value)} required />
+            <Field label="Email Address">
+              <input type="email" className={inputCls} placeholder="example@mail.com" value={form.email} onChange={(e) => set("email", e.target.value)} />
             </Field>
-            <Field label="Mobile 2">
-              <input type="tel" className={inputCls} placeholder="Secondary (optional)" value={form.mobile2} onChange={(e) => set("mobile2", e.target.value)} />
+            <Field label="Mobile Number 1" required>
+              <input type="tel" className={inputCls} placeholder="Primary mobile number" value={form.mobile1} onChange={(e) => set("mobile1", e.target.value)} required />
             </Field>
-            <Field label="Email" className="col-span-full">
-              <input type="email" className={inputCls} placeholder="Email address (optional)" value={form.email} onChange={(e) => set("email", e.target.value)} />
+            <Field label="Mobile Number 2">
+              <input type="tel" className={inputCls} placeholder="Alternate number (optional)" value={form.mobile2} onChange={(e) => set("mobile2", e.target.value)} />
             </Field>
           </div>
 
+          {/* ── Section 04: Personal Info ── */}
           <SectionTitle>04 — Personal Information</SectionTitle>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <Field label="Occupation">
-              <input className={inputCls} placeholder="Occupation" value={form.occupation} onChange={(e) => set("occupation", e.target.value)} />
+              <input className={inputCls} placeholder="Current occupation" value={form.occupation} onChange={(e) => set("occupation", e.target.value)} />
             </Field>
-            <Field label="Education">
+            <Field label="Education Qualification">
               <input className={inputCls} placeholder="Highest qualification" value={form.education} onChange={(e) => set("education", e.target.value)} />
             </Field>
             <Field label="Marital Status">
@@ -936,7 +1038,7 @@ function RegistrationForm({ onCreated, collapsed, onToggle }) {
                 <option>Unmarried</option>
               </select>
             </Field>
-            <Field label="Is Associated with Any Org?">
+            <Field label="Associated with Any Social Organization?">
               <select className={inputCls} value={form.isAssociated} onChange={(e) => set("isAssociated", e.target.value)}>
                 <option value="">Select</option>
                 <option>Yes</option>
@@ -944,44 +1046,104 @@ function RegistrationForm({ onCreated, collapsed, onToggle }) {
               </select>
             </Field>
             {form.isAssociated === "Yes" && (
-              <Field label="Organization Name" className="col-span-full">
-                <input className={inputCls} placeholder="Organization name" value={form.organizationName} onChange={(e) => set("organizationName", e.target.value)} />
+              <Field label="If Yes, Which Organization?" className="col-span-full">
+                <input
+                  className={inputCls}
+                  placeholder="Name of the organization"
+                  value={form.organizationName}
+                  onChange={(e) => set("organizationName", e.target.value)}
+                />
               </Field>
             )}
-            <Field label="Brief Description" className="col-span-full">
-              <textarea className={`${inputCls} resize-y min-h-[80px]`} placeholder="Any additional notes…" value={form.briefDescription} onChange={(e) => set("briefDescription", e.target.value)} />
+            <Field label="Brief Description / Details" className="col-span-full">
+              <textarea
+                className={`${inputCls} resize-y min-h-[88px]`}
+                placeholder="Any additional notes, background, or details about the applicant…"
+                value={form.briefDescription}
+                onChange={(e) => set("briefDescription", e.target.value)}
+              />
             </Field>
           </div>
 
-          <SectionTitle>05 — Documents Upload</SectionTitle>
-          <div className="grid grid-cols-3 gap-3 sm:gap-4">
-            {/* No downloadUrl on registration form — files don't exist yet */}
+          {/* ── ADDED: Section 05: Media (YouTube) ── */}
+          <SectionTitle>05 — Media</SectionTitle>
+          <div className="grid grid-cols-1 gap-3 sm:gap-4">
+            <Field label="YouTube Video Link">
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-red-500 pointer-events-none">
+                  <IconYoutube />
+                </span>
+                <input
+                  type="url"
+                  className={`${inputCls} pl-9`}
+                  placeholder="https://www.youtube.com/watch?v=... (optional)"
+                  value={form.youtubeLink}
+                  onChange={(e) => set("youtubeLink", e.target.value)}
+                />
+              </div>
+              {form.youtubeLink && (
+                <a
+                  href={form.youtubeLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-red-600 hover:text-red-700 underline underline-offset-2 mt-1"
+                >
+                  <IconYoutube /> Preview link
+                </a>
+              )}
+            </Field>
+          </div>
+
+          {/* ── Section 06: Attachments ── */}
+          <SectionTitle>06 — Required Attachments</SectionTitle>
+          <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-4 flex items-start gap-2">
+            <svg className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-xs text-amber-700 font-medium">
+              Please attach a clear copy of both Aadhaar Card and PAN Card. Accepted formats: JPG, PNG, WEBP, PDF.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             <ImageUploadBox
-              label="Passport Photo"
-              preview={photoPreview}
-              inputRef={photoRef}
-              isChanged={!!photoFile}
-              onChange={makeFileHandler(setPhotoFile, setPhotoPreview)}
-              onClear={() => { setPhotoFile(null); setPhotoPreview(null); if (photoRef.current) photoRef.current.value = ""; }}
+              label="Passport Size Photo"
+              preview={passportPreview}
+              inputRef={passportRef}
+              isChanged={!!passportFile}
+              onChange={makeFileHandler(setPassportFile, setPassportPreview)}
+              onClear={() => {
+                setPassportFile(null);
+                setPassportPreview(null);
+                if (passportRef.current) passportRef.current.value = "";
+              }}
             />
             <ImageUploadBox
-              label="Aadhar Card"
+              label="Aadhaar Card Copy"
               preview={aadharPreview}
               inputRef={aadharRef}
               isChanged={!!aadharFile}
               onChange={makeFileHandler(setAadharFile, setAadharPreview)}
-              onClear={() => { setAadharFile(null); setAadharPreview(null); if (aadharRef.current) aadharRef.current.value = ""; }}
+              onClear={() => {
+                setAadharFile(null);
+                setAadharPreview(null);
+                if (aadharRef.current) aadharRef.current.value = "";
+              }}
             />
             <ImageUploadBox
-              label="Soldier ID"
-              preview={soldierPreview}
-              inputRef={soldierRef}
-              isChanged={!!soldierFile}
-              onChange={makeFileHandler(setSoldierFile, setSoldierPreview)}
-              onClear={() => { setSoldierFile(null); setSoldierPreview(null); if (soldierRef.current) soldierRef.current.value = ""; }}
+              label="PAN Card Copy"
+              preview={panPreview}
+              inputRef={panRef}
+              isChanged={!!panFile}
+              onChange={makeFileHandler(setPanFile, setPanPreview)}
+              onClear={() => {
+                setPanFile(null);
+                setPanPreview(null);
+                if (panRef.current) panRef.current.value = "";
+              }}
             />
           </div>
 
+          {/* ── Feedback ── */}
           {error && (
             <div className="mt-5 flex items-start gap-2 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
               <svg className="w-4 h-4 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -999,6 +1161,7 @@ function RegistrationForm({ onCreated, collapsed, onToggle }) {
             </div>
           )}
 
+          {/* ── Actions ── */}
           <div className="flex flex-col-reverse sm:flex-row gap-3 pt-5">
             <button
               type="button"
@@ -1046,7 +1209,8 @@ function MembersTable({ members, loading, error, onRefresh, onView, onEdit, onDe
 
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
   const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
-  const fmt = (d) => d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+  const fmt = (d) =>
+    d ? new Date(d).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 
   useEffect(() => { setPage(1); }, [search]);
 
@@ -1114,13 +1278,15 @@ function MembersTable({ members, loading, error, onRefresh, onView, onEdit, onDe
         </div>
       ) : (
         <>
-          {/* ── Desktop Table (lg+) ── */}
+          {/* ── Desktop Table ── */}
           <div className="hidden lg:block overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-50/80 border-b border-gray-100">
                   {["#", "Membership No.", "Full Name", "DOB", "District / State", "Mobile", "Docs", "Registered", "Actions"].map((h) => (
-                    <th key={h} className="px-3 py-3 text-left text-[10px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap first:pl-5 last:pr-5">{h}</th>
+                    <th key={h} className="px-3 py-3 text-left text-[10px] font-black tracking-widest uppercase text-gray-400 whitespace-nowrap first:pl-5 last:pr-5">
+                      {h}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -1129,7 +1295,9 @@ function MembersTable({ members, loading, error, onRefresh, onView, onEdit, onDe
                   <tr key={member._id} className="hover:bg-[#f7f9ff] transition-colors group">
                     <td className="pl-5 py-3.5 text-gray-400 text-xs tabular-nums">{(page - 1) * PER_PAGE + idx + 1}</td>
                     <td className="px-3 py-3.5 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-lg bg-[#EEF0FB] text-[#293C86] text-xs font-bold">{member.membershipNumber}</span>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-lg bg-[#EEF0FB] text-[#293C86] text-xs font-bold">
+                        {member.membershipNumber}
+                      </span>
                     </td>
                     <td className="px-3 py-3.5">
                       <p className="font-semibold text-[#1a2744] text-sm leading-tight">{member.fullName}</p>
@@ -1144,10 +1312,7 @@ function MembersTable({ members, loading, error, onRefresh, onView, onEdit, onDe
                       <p className="text-gray-700 text-xs tabular-nums">{member.mobile1}</p>
                       {member.mobile2 && <p className="text-gray-400 text-[11px] tabular-nums">{member.mobile2}</p>}
                     </td>
-                    <td className="px-3 py-3.5">
-                      {/* DocBadges now trigger download on click */}
-                      <DocBadges member={member} />
-                    </td>
+                    <td className="px-3 py-3.5"><DocBadges member={member} /></td>
                     <td className="px-3 py-3.5 text-gray-400 text-xs whitespace-nowrap tabular-nums">{fmt(member.createdAt)}</td>
                     <td className="px-3 pr-5 py-3.5">
                       <div className="flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
@@ -1171,7 +1336,7 @@ function MembersTable({ members, loading, error, onRefresh, onView, onEdit, onDe
             </table>
           </div>
 
-          {/* ── Mobile / Tablet Cards (< lg) ── */}
+          {/* ── Mobile Cards ── */}
           <div className="lg:hidden divide-y divide-gray-100">
             {paginated.map((member, idx) => (
               <div key={member._id} className="p-3 sm:p-4 active:bg-gray-50 transition-colors">
@@ -1179,7 +1344,9 @@ function MembersTable({ members, loading, error, onRefresh, onView, onEdit, onDe
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       <span className="text-[10px] text-gray-400 tabular-nums font-bold">#{(page - 1) * PER_PAGE + idx + 1}</span>
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-lg bg-[#EEF0FB] text-[#293C86] text-[10px] font-black">{member.membershipNumber}</span>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-lg bg-[#EEF0FB] text-[#293C86] text-[10px] font-black">
+                        {member.membershipNumber}
+                      </span>
                     </div>
                     <p className="font-bold text-[#1a2744] text-sm leading-tight">{member.fullName}</p>
                     {member.email && <p className="text-[11px] text-gray-400 mt-0.5 truncate">{member.email}</p>}
@@ -1194,12 +1361,11 @@ function MembersTable({ members, loading, error, onRefresh, onView, onEdit, onDe
                     <button onClick={() => onDelete(member)} aria-label="Delete" className="w-9 h-9 rounded-xl flex items-center justify-center text-white bg-red-500 hover:bg-red-600 active:scale-95 transition">
                       <IconDelete />
                     </button>
-                    <button onClick={() => handleDownload(member._id)} title="Download PDF" className="w-9 h-9 rounded-xl flex items-center justify-center text-white bg-green-500 hover:bg-green-600 active:scale-95 transition text-[10px] font-black">
+                    <button onClick={() => handleDownload(member._id)} title="PDF" className="w-9 h-9 rounded-xl flex items-center justify-center text-white bg-green-500 hover:bg-green-600 active:scale-95 transition text-[10px] font-black">
                       PDF
                     </button>
                   </div>
                 </div>
-
                 <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-2.5">
                   {[
                     { label: "Mobile", value: member.mobile1 },
@@ -1213,10 +1379,8 @@ function MembersTable({ members, loading, error, onRefresh, onView, onEdit, onDe
                     </div>
                   ))}
                 </div>
-
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-[9px] font-black tracking-widest uppercase text-gray-400">Docs</span>
-                  {/* Clicking P/A/S badge triggers download */}
                   <DocBadges member={member} />
                   <span className="ml-auto text-[10px] text-gray-400 tabular-nums">{fmt(member.createdAt)}</span>
                 </div>
@@ -1233,18 +1397,32 @@ function MembersTable({ members, loading, error, onRefresh, onView, onEdit, onDe
             {(page - 1) * PER_PAGE + 1}–{Math.min(page * PER_PAGE, filtered.length)} of {filtered.length}
           </p>
           <div className="flex items-center gap-1">
-            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="w-9 h-9 rounded-xl border border-gray-200 text-sm font-bold text-gray-500 hover:bg-gray-50 disabled:opacity-40 transition flex items-center justify-center">‹</button>
+            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="w-9 h-9 rounded-xl border border-gray-200 text-sm font-bold text-gray-500 hover:bg-gray-50 disabled:opacity-40 transition flex items-center justify-center">
+              ‹
+            </button>
             {Array.from({ length: totalPages }, (_, i) => i + 1)
               .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 1)
-              .reduce((acc, p, i, arr) => { if (i > 0 && p - arr[i - 1] > 1) acc.push("..."); acc.push(p); return acc; }, [])
+              .reduce((acc, p, i, arr) => {
+                if (i > 0 && p - arr[i - 1] > 1) acc.push("...");
+                acc.push(p);
+                return acc;
+              }, [])
               .map((p, i) =>
                 p === "..." ? (
                   <span key={`e-${i}`} className="w-9 text-center text-gray-400 text-sm">…</span>
                 ) : (
-                  <button key={p} onClick={() => setPage(p)} className={`w-9 h-9 rounded-xl text-sm font-bold transition ${page === p ? "bg-[#293C86] text-white" : "border border-gray-200 text-gray-500 hover:bg-gray-50"}`}>{p}</button>
+                  <button
+                    key={p}
+                    onClick={() => setPage(p)}
+                    className={`w-9 h-9 rounded-xl text-sm font-bold transition ${page === p ? "bg-[#293C86] text-white" : "border border-gray-200 text-gray-500 hover:bg-gray-50"}`}
+                  >
+                    {p}
+                  </button>
                 ),
               )}
-            <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="w-9 h-9 rounded-xl border border-gray-200 text-sm font-bold text-gray-500 hover:bg-gray-50 disabled:opacity-40 transition flex items-center justify-center">›</button>
+            <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="w-9 h-9 rounded-xl border border-gray-200 text-sm font-bold text-gray-500 hover:bg-gray-50 disabled:opacity-40 transition flex items-center justify-center">
+              ›
+            </button>
           </div>
         </div>
       )}
@@ -1298,7 +1476,7 @@ export default function MembershipAdminPage() {
         {/* Page Header */}
         <div className="mb-4 sm:mb-6 flex items-start justify-between gap-3 flex-wrap">
           <div>
-            <h1 className="text-lg sm:text-xl lg:text-2xl font-black text-[#1a2744] tracking-tight leading-tight">Membership Administration</h1>
+            <h1 className="text-lg sm:text-xl lg:text-2xl font-black text-[#1a2744] tracking-tight leading-tight">Volunteer Form</h1>
             <p className="text-xs sm:text-sm text-gray-500 mt-1">Register new members and manage all existing membership records.</p>
           </div>
           <button
@@ -1315,11 +1493,14 @@ export default function MembershipAdminPage() {
             { label: "Total Members", value: members.length, color: "bg-[#293C86]" },
             {
               label: "This Month",
-              value: members.filter((m) => { const d = new Date(m.createdAt), n = new Date(); return d.getMonth() === n.getMonth() && d.getFullYear() === n.getFullYear(); }).length,
+              value: members.filter((m) => {
+                const d = new Date(m.createdAt), n = new Date();
+                return d.getMonth() === n.getMonth() && d.getFullYear() === n.getFullYear();
+              }).length,
               color: "bg-green-600",
             },
             { label: "States Covered", value: new Set(members.map((m) => m.state).filter(Boolean)).size, color: "bg-orange-500" },
-            { label: "With All Docs", value: members.filter((m) => m.photo?.url && m.aadharCard?.url && m.soldierIdCard?.url).length, color: "bg-teal-600" },
+            { label: "With All Docs", value: members.filter((m) => m.aadharCard?.url && m.panCard?.url).length, color: "bg-teal-600" },
           ].map(({ label, value, color }) => (
             <div key={label} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
               <div className={`w-1.5 h-10 rounded-full ${color} shrink-0`} />
@@ -1332,8 +1513,15 @@ export default function MembershipAdminPage() {
         </div>
 
         <RegistrationForm onCreated={handleCreated} collapsed={formCollapsed} onToggle={() => setFormCollapsed((v) => !v)} />
-
-        <MembersTable members={members} loading={loading} error={error} onRefresh={loadMembers} onView={setViewMember} onEdit={setEditMember} onDelete={setDeleteMember} />
+        <MembersTable
+          members={members}
+          loading={loading}
+          error={error}
+          onRefresh={loadMembers}
+          onView={setViewMember}
+          onEdit={setEditMember}
+          onDelete={setDeleteMember}
+        />
       </div>
 
       {/* Mobile FAB */}

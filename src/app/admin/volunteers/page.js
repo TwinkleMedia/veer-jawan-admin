@@ -7,7 +7,7 @@ export default function VolunteersPage() {
     <div className="p-6">
 
       <h1 className="text-2xl font-bold mb-6 text-orange-700">
-       Membership Management
+      Volunteer Form
       </h1>
 
       <MembershipForm />
