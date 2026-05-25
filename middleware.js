@@ -4,7 +4,7 @@ export function middleware(request){
     // Protect admin routes 
     if(request.nextUrl.pathname.startsWith("/admin")){
         if(!token){
-            return NextResponse.redirect(new URL("/login", request.url));
+return NextResponse.redirect(new URL("/admin/login", request.url));
         }
     }
     return NextResponse.next();
