@@ -115,27 +115,27 @@ export default function DonationManagement() {
   };
 
   // ── Delete Handler ────────────────────────────────────────────────
-  const handleDelete = async () => {
-    if (!deleteTarget) return;
-    setDeleting(true);
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/donation/${deleteTarget._id}`,
-        { method: "DELETE" }
-      );
-      const data = await res.json();
-      if (data.success) {
-        setDonations((prev) => prev.filter((d) => d._id !== deleteTarget._id));
-        setDeleteTarget(null);
-      } else {
-        alert("Failed to delete: " + data.message);
-      }
-    } catch (err) {
-      alert("Error deleting donation: " + err.message);
-    } finally {
-      setDeleting(false);
+ const handleDelete = async () => {
+  if (!deleteTarget) return;
+  setDeleting(true);
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/donation/delete/${deleteTarget._id}`,
+      { method: "POST" }  // ← POST instead of DELETE
+    );
+    const data = await res.json();
+    if (data.success) {
+      setDonations((prev) => prev.filter((d) => d._id !== deleteTarget._id));
+      setDeleteTarget(null);
+    } else {
+      alert("Failed to delete: " + data.message);
     }
-  };
+  } catch (err) {
+    alert("Error deleting donation: " + err.message);
+  } finally {
+    setDeleting(false);
+  }
+};
 
   // ── Stats ──────────────────────────────────────────────────────────
   const totalAmount = donations.reduce((s, d) => s + d.amount, 0);
