@@ -53,7 +53,7 @@ export default function UploadBanner() {
 
       const cloudinaryRes = await fetch(
         "https://api.cloudinary.com/v1_1/dm9dtfpjd/image/upload",
-        { method: "POST", body: cloudinaryForm }
+        { method: "POST", body: cloudinaryForm },
       );
       const cloudinaryData = await cloudinaryRes.json();
 
@@ -88,9 +88,12 @@ export default function UploadBanner() {
   const deleteBanner = async (id) => {
     if (!confirm("Are you sure you want to delete this banner?")) return;
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/banner/${id}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/banner/${id}`,
+        {
+          method: "DELETE",
+        },
+      );
       if (res.ok) {
         fetchBanners();
       } else {
@@ -104,7 +107,6 @@ export default function UploadBanner() {
   return (
     <div className="min-h-screen bg-amber-50 px-4 py-8 sm:py-12">
       <div className="w-full max-w-2xl mx-auto">
-
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-2xl sm:text-4xl font-extrabold text-orange-700">
@@ -118,10 +120,12 @@ export default function UploadBanner() {
         {/* Upload Card */}
         <div className="bg-white rounded-3xl shadow-xl border border-orange-100">
           <form onSubmit={handleSubmit} className="p-5 sm:p-8">
-
             {/* Drop Zone */}
             <div
-              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragOver(true);
+              }}
               onDragLeave={() => setDragOver(false)}
               onDrop={handleDrop}
               className={`border-2 border-dashed rounded-2xl p-8 sm:p-10 text-center transition-colors ${
@@ -134,8 +138,12 @@ export default function UploadBanner() {
               <p className="text-orange-700 font-semibold text-sm sm:text-base mb-1">
                 Drag & drop your banner here
               </p>
-              <p className="text-gray-400 text-xs mb-4">or browse to choose a file</p>
-
+              <p className="text-gray-400 text-xs mb-4">
+                or browse to choose a file
+              </p>
+              <p className="text-red-500 text-xs mb-4">
+                Maximum file size allowed: 5 MB
+              </p>
               <label className="inline-block cursor-pointer">
                 <span className="px-4 py-2 text-xs sm:text-sm font-bold bg-orange-100 hover:bg-orange-200 text-orange-700 rounded-lg transition">
                   Browse File
@@ -165,7 +173,10 @@ export default function UploadBanner() {
                 />
                 <button
                   type="button"
-                  onClick={() => { setPreview(null); setImage(null); }}
+                  onClick={() => {
+                    setPreview(null);
+                    setImage(null);
+                  }}
                   className="absolute top-2 right-2 w-7 h-7 bg-red-500 hover:bg-red-600 text-white rounded-full text-xs font-bold flex items-center justify-center shadow transition"
                 >
                   ✕
@@ -188,9 +199,24 @@ export default function UploadBanner() {
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                  <svg
+                    className="animate-spin h-4 w-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v8z"
+                    />
                   </svg>
                   Uploading...
                 </span>
@@ -198,7 +224,6 @@ export default function UploadBanner() {
                 "🚀 Upload Banner"
               )}
             </button>
-
           </form>
         </div>
 
@@ -225,14 +250,21 @@ export default function UploadBanner() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="bg-orange-50 text-orange-700 text-xs uppercase tracking-wider">
-                      <th className="px-4 py-3 text-left rounded-tl-xl">Preview</th>
+                      <th className="px-4 py-3 text-left rounded-tl-xl">
+                        Preview
+                      </th>
                       <th className="px-4 py-3 text-left">Upload Date</th>
-                      <th className="px-4 py-3 text-right rounded-tr-xl">Action</th>
+                      <th className="px-4 py-3 text-right rounded-tr-xl">
+                        Action
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-orange-50">
                     {banners.map((banner) => (
-                      <tr key={banner._id} className="hover:bg-orange-50/30 transition">
+                      <tr
+                        key={banner._id}
+                        className="hover:bg-orange-50/30 transition"
+                      >
                         <td className="px-4 py-3">
                           <img
                             src={banner.imageUrl}
@@ -241,9 +273,14 @@ export default function UploadBanner() {
                           />
                         </td>
                         <td className="px-4 py-3 text-gray-500">
-                          {new Date(banner.createdAt).toLocaleDateString("en-IN", {
-                            day: "numeric", month: "short", year: "numeric"
-                          })}
+                          {new Date(banner.createdAt).toLocaleDateString(
+                            "en-IN",
+                            {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            },
+                          )}
                         </td>
                         <td className="px-4 py-3 text-right">
                           <button
@@ -274,9 +311,14 @@ export default function UploadBanner() {
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-gray-400">Uploaded</p>
                       <p className="text-sm font-medium text-gray-700 truncate">
-                        {new Date(banner.createdAt).toLocaleDateString("en-IN", {
-                          day: "numeric", month: "short", year: "numeric"
-                        })}
+                        {new Date(banner.createdAt).toLocaleDateString(
+                          "en-IN",
+                          {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          },
+                        )}
                       </p>
                     </div>
                     <button
@@ -291,7 +333,6 @@ export default function UploadBanner() {
             </>
           )}
         </div>
-
       </div>
     </div>
   );

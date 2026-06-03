@@ -839,7 +839,7 @@ export default function MartyrVeerJawanPage() {
                   onChange={(e) => set("wifeName", e.target.value)}
                 />
               </Field>
-              <Field label="Number of Sons">
+              <Field label="Number of Sons & Daughters">
                 <input
                   type="number"
                   min="0"

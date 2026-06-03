@@ -135,7 +135,7 @@ export default function DonationManagement() {
   } finally {
     setDeleting(false);
   }
-};
+};                  
 
   // ── Stats ──────────────────────────────────────────────────────────
   const totalAmount = donations.reduce((s, d) => s + d.amount, 0);
