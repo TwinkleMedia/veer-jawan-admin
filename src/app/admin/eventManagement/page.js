@@ -362,15 +362,16 @@ function EditModal({ event, onClose, onSaved }) {
         </Field>
 
         {/* Booking Link */}
-        <Field label="Booking Link" icon={<LinkIcon />}>
-          <input
-            type="url"
-            className={inputCls}
-            placeholder="https://example.com/book"
-            value={form.bookingLink}
-            onChange={(e) => set("bookingLink", e.target.value)}
-          />
-        </Field>
+        {/* Booking Link */}
+<Field label="Booking Link" icon={<LinkIcon />}>
+  <input
+    type="text"
+    className={inputCls}
+    placeholder="https://example.com/book"
+    value={form.bookingLink}
+    onChange={(e) => set("bookingLink", e.target.value)}
+  />
+</Field>
 
         {/* Image */}
         <Field label="Event Image"
@@ -534,15 +535,16 @@ function CreateEventForm({ onCreated }) {
         </Field>
 
         {/* Booking Link */}
-        <Field label="Booking Link" icon={<LinkIcon />}>
-          <input
-            type="url"
-            className={inputCls}
-            placeholder="https://example.com/book"
-            value={form.bookingLink}
-            onChange={(e) => set("bookingLink", e.target.value)}
-          />
-        </Field>
+        {/* Booking Link */}
+<Field label="Booking Link" icon={<LinkIcon />}>
+  <input
+    type="text"
+    className={inputCls}
+    placeholder="https://example.com/book"
+    value={form.bookingLink}
+    onChange={(e) => set("bookingLink", e.target.value)}
+  />
+</Field>
 
         {/* Image Upload */}
         <Field label="Event Image" required
