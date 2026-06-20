@@ -23,6 +23,13 @@ const MapPinIcon = () => (
   </svg>
 );
 
+const LinkIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+    <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" />
+    <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
+  </svg>
+);
+
 const ImageIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-8 h-8">
     <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -98,7 +105,14 @@ const fetcher = async (url, options = {}) => {
   return data;
 };
 
-const INITIAL_FORM = { title: "", date: "", time: "", address: "", description: "" };
+const INITIAL_FORM = {
+  title: "",
+  date: "",
+  time: "",
+  address: "",
+  description: "",
+  bookingLink: "",
+};
 
 const inputCls =
   "w-full px-4 py-3 border border-gray-200 rounded-xl text-sm text-gray-800 bg-white focus:outline-none focus:border-[#293C86] focus:ring-2 focus:ring-[#293C86]/10 transition placeholder-gray-400";
@@ -145,7 +159,6 @@ function ViewModal({ event, onClose }) {
   return (
     <Modal title={`View Event — ${event.title}`} onClose={onClose} maxWidth="max-w-xl">
       <div className="space-y-4">
-        {/* ✅ FIX: was event.imageUrl — now correctly checks event.image?.url */}
         {event.image?.url && (
           <img
             src={event.image.url}
@@ -181,6 +194,22 @@ function ViewModal({ event, onClose }) {
           <div className="p-3 bg-gray-50 rounded-xl">
             <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">Description</p>
             <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{event.description}</p>
+          </div>
+        )}
+        {event.bookingLink && (
+          <div className="flex items-start gap-2 p-3 bg-blue-50 rounded-xl">
+            <span className="text-[#293C86] mt-0.5"><LinkIcon /></span>
+            <div className="min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1">Booking Link</p>
+              <a
+                href={event.bookingLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-[#293C86] font-semibold hover:underline break-all"
+              >
+                {event.bookingLink}
+              </a>
+            </div>
           </div>
         )}
         <div className="flex gap-2 text-xs text-gray-400">
@@ -250,9 +279,9 @@ function EditModal({ event, onClose, onSaved }) {
     time:        event.time || "",
     address:     event.address || "",
     description: event.description || "",
+    bookingLink: event.bookingLink || "",
   });
   const [imageFile,    setImageFile]    = useState(null);
-  // ✅ FIX: was event.imageUrl — now correctly reads event.image?.url
   const [imagePreview, setImagePreview] = useState(event.image?.url || null);
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState("");
@@ -300,14 +329,16 @@ function EditModal({ event, onClose, onSaved }) {
   };
 
   return (
-    <Modal title={`Edit Event`} onClose={onClose} maxWidth="max-w-xl">
+    <Modal title="Edit Event" onClose={onClose} maxWidth="max-w-xl">
       <div className="space-y-4">
 
+        {/* Title */}
         <Field label="Event Title" required
           icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>}>
           <input type="text" className={inputCls} value={form.title} onChange={(e) => set("title", e.target.value)} />
         </Field>
 
+        {/* Date + Time */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Field label="Date" required icon={<CalendarIcon />}>
             <input type="date" className={inputCls} value={form.date} onChange={(e) => set("date", e.target.value)} />
@@ -317,15 +348,28 @@ function EditModal({ event, onClose, onSaved }) {
           </Field>
         </div>
 
+        {/* Address */}
         <Field label="Address" required icon={<MapPinIcon />}>
           <textarea className={`${inputCls} resize-y min-h-[80px]`} value={form.address}
             onChange={(e) => set("address", e.target.value)} />
         </Field>
 
+        {/* Description */}
         <Field label="Description"
           icon={<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></svg>}>
           <textarea className={`${inputCls} resize-y min-h-[80px]`} value={form.description}
             onChange={(e) => set("description", e.target.value)} />
+        </Field>
+
+        {/* Booking Link */}
+        <Field label="Booking Link" icon={<LinkIcon />}>
+          <input
+            type="url"
+            className={inputCls}
+            placeholder="https://example.com/book"
+            value={form.bookingLink}
+            onChange={(e) => set("bookingLink", e.target.value)}
+          />
         </Field>
 
         {/* Image */}
@@ -419,11 +463,11 @@ function CreateEventForm({ onCreated }) {
     e.preventDefault();
     setError(""); setSuccess("");
 
-    if (!form.title.trim()) return setError("Event title is required.");
-    if (!form.date)         return setError("Event date is required.");
-    if (!form.time)         return setError("Event time is required.");
+    if (!form.title.trim())   return setError("Event title is required.");
+    if (!form.date)           return setError("Event date is required.");
+    if (!form.time)           return setError("Event time is required.");
     if (!form.address.trim()) return setError("Event address is required.");
-    if (!imageFile)         return setError("Event image is required.");
+    if (!imageFile)           return setError("Event image is required.");
 
     setLoading(true);
     try {
@@ -487,6 +531,17 @@ function CreateEventForm({ onCreated }) {
           <textarea className={`${inputCls} resize-y min-h-[100px]`}
             placeholder="Describe the event — purpose, program schedule, guests, etc."
             value={form.description} onChange={(e) => set("description", e.target.value)} />
+        </Field>
+
+        {/* Booking Link */}
+        <Field label="Booking Link" icon={<LinkIcon />}>
+          <input
+            type="url"
+            className={inputCls}
+            placeholder="https://example.com/book"
+            value={form.bookingLink}
+            onChange={(e) => set("bookingLink", e.target.value)}
+          />
         </Field>
 
         {/* Image Upload */}
@@ -647,11 +702,12 @@ function EventsTable({ events, loading, error, onRefresh, onView, onEdit, onDele
             <table className="w-full text-sm table-fixed">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-100">
-                  <th className="px-4 py-3 text-left text-[11px] font-bold tracking-wider uppercase text-gray-400 w-[30%]">Event</th>
-                  <th className="px-4 py-3 text-left text-[11px] font-bold tracking-wider uppercase text-gray-400 w-[15%]">Date</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-bold tracking-wider uppercase text-gray-400 w-[28%]">Event</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-bold tracking-wider uppercase text-gray-400 w-[14%]">Date</th>
                   <th className="px-4 py-3 text-left text-[11px] font-bold tracking-wider uppercase text-gray-400 w-[10%]">Time</th>
-                  <th className="px-4 py-3 text-left text-[11px] font-bold tracking-wider uppercase text-gray-400 w-[28%]">Address</th>
-                  <th className="px-4 py-3 text-left text-[11px] font-bold tracking-wider uppercase text-gray-400 w-[17%]">Actions</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-bold tracking-wider uppercase text-gray-400 w-[22%]">Address</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-bold tracking-wider uppercase text-gray-400 w-[12%]">Booking</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-bold tracking-wider uppercase text-gray-400 w-[14%]">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -661,7 +717,6 @@ function EventsTable({ events, loading, error, onRefresh, onView, onEdit, onDele
                     {/* Event */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3 min-w-0">
-                        {/* ✅ Already correct in original — event.image.url */}
                         {event.image?.url ? (
                           <img src={event.image.url} alt={event.title}
                             className="w-10 h-10 rounded-lg object-cover shrink-0 border border-gray-100" />
@@ -697,6 +752,23 @@ function EventsTable({ events, loading, error, onRefresh, onView, onEdit, onDele
                       <p className="text-xs text-gray-500 truncate">{event.address}</p>
                     </td>
 
+                    {/* Booking Link */}
+                    <td className="px-4 py-3">
+                      {event.bookingLink ? (
+                        <a
+                          href={event.bookingLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs font-semibold text-[#293C86] hover:underline truncate max-w-[100px]"
+                        >
+                          <LinkIcon />
+                          Link
+                        </a>
+                      ) : (
+                        <span className="text-xs text-gray-300">—</span>
+                      )}
+                    </td>
+
                     {/* Actions */}
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1.5">
@@ -724,7 +796,6 @@ function EventsTable({ events, loading, error, onRefresh, onView, onEdit, onDele
           <div className="md:hidden divide-y divide-gray-100">
             {paginated.map((event) => (
               <div key={event._id} className="p-3 sm:p-4 flex gap-3">
-                {/* ✅ FIX: was event.imageUrl — now correctly reads event.image?.url */}
                 {event.image?.url ? (
                   <img
                     src={event.image.url}
@@ -750,7 +821,17 @@ function EventsTable({ events, loading, error, onRefresh, onView, onEdit, onDele
                       <span className="text-[#FF671F]"><ClockIcon /></span>{event.time || "—"}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-400 truncate mb-2">{event.address}</p>
+                  <p className="text-xs text-gray-400 truncate mb-1">{event.address}</p>
+                  {event.bookingLink && (
+                    <a
+                      href={event.bookingLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-[#293C86] hover:underline mb-2"
+                    >
+                      <LinkIcon /> Booking Link
+                    </a>
+                  )}
                   {/* Action buttons */}
                   <div className="flex items-center gap-1.5">
                     <button onClick={() => onView(event)} title="View"
