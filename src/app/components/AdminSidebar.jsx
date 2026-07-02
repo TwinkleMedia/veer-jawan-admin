@@ -30,8 +30,8 @@ const navItems = [
   },
 
   {
-    name: "Membership Management",
-    href: "/admin/volunteers",
+    name: "Volunteers Management",
+    href: "/admin/",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
         <circle cx="9" cy="7" r="4"/>
@@ -52,7 +52,7 @@ const navItems = [
     ),
   },
   {
-    name: "Martyr Veer Jawan",
+    name: "Ex Serviesman Managemnt ",
     href: "/admin/Martyr_Veer_Jawan",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">

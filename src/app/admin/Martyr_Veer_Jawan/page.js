@@ -702,10 +702,10 @@ export default function MartyrVeerJawanPage() {
         {/* ── Page Header ── */}
         <div ref={formRef}>
           <h1 className="text-lg sm:text-xl lg:text-2xl font-black text-[#1a2744] tracking-tight leading-tight">
-            Martyr Veer Jawan
+            Ex serviesman 
           </h1>
           <p className="text-xs sm:text-sm text-gray-500 mt-1">
-            Register a martyr's complete profile with all required details.
+            Register a Ex serviesman's complete profile with all required details.
           </p>
         </div>
 
@@ -794,7 +794,7 @@ export default function MartyrVeerJawanPage() {
               </Field>
             </div>
 
-            <SectionTitle number="03">Martyr Details</SectionTitle>
+            <SectionTitle number="03">Ex Serviesman Details</SectionTitle>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <Field label="Date of Martyrdom" required>
                 <input
@@ -1028,7 +1028,7 @@ export default function MartyrVeerJawanPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 sm:px-6 py-4 bg-gradient-to-r from-[#1a2744] to-[#293C86] border-b-2 border-[#FF671F]">
             <div>
               <h2 className="text-white font-bold text-sm sm:text-base tracking-wide">
-                Registered Martyrs
+                Registered Ex Serviesman
               </h2>
               <p className="text-white/60 text-xs mt-0.5">
                 {tableMeta.total} record{tableMeta.total !== 1 ? "s" : ""} found
