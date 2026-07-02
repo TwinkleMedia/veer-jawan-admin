@@ -732,7 +732,7 @@ export default function MartyrVeerJawanPage() {
             </div>
             <div className="flex-1">
               <h2 className="text-white font-bold text-sm sm:text-base tracking-wide">
-                {editId ? "Edit Martyr Profile" : "New Martyr Registration"}
+                {editId ? "Edit Martyr Profile" : "Ex serviesman Registration"}
               </h2>
               <p className="text-white/60 text-xs mt-0.5">
                 Fill all required fields marked with *
