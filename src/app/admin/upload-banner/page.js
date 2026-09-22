@@ -12,6 +12,9 @@ export default function UploadBanner() {
   // Maximum image size: 1 MB
   const MAX_FILE_SIZE = 1 * 1024 * 1024;
 
+  // ==========================================
+  // VALIDATE IMAGE
+  // ==========================================
   const validateImage = (file) => {
     if (!file) return false;
 
@@ -28,6 +31,9 @@ export default function UploadBanner() {
     return true;
   };
 
+  // ==========================================
+  // FETCH BANNERS
+  // ==========================================
   const fetchBanners = async () => {
     try {
       const res = await fetch(
@@ -35,6 +41,10 @@ export default function UploadBanner() {
       );
 
       const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.error || "Failed to fetch banners");
+      }
 
       setBanners(data);
     } catch (error) {
@@ -46,9 +56,9 @@ export default function UploadBanner() {
     fetchBanners();
   }, []);
 
-  // ==============================
+  // ==========================================
   // SELECT IMAGE
-  // ==============================
+  // ==========================================
   const handleImageChange = (e) => {
     const file = e.target.files[0];
 
@@ -63,9 +73,9 @@ export default function UploadBanner() {
     setPreview(URL.createObjectURL(file));
   };
 
-  // ==============================
+  // ==========================================
   // DRAG & DROP
-  // ==============================
+  // ==========================================
   const handleDrop = (e) => {
     e.preventDefault();
     setDragOver(false);
@@ -78,9 +88,9 @@ export default function UploadBanner() {
     setPreview(URL.createObjectURL(file));
   };
 
-  // ==============================
+  // ==========================================
   // UPLOAD BANNER
-  // ==============================
+  // ==========================================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -89,25 +99,36 @@ export default function UploadBanner() {
       return;
     }
 
-    if (!validateImage(image)) {
+    // Maximum 1 MB
+    if (image.size > MAX_FILE_SIZE) {
+      alert("Image size must be 1 MB or less");
       return;
     }
 
-    setLoading(true);
+    if (!image.type.startsWith("image/")) {
+      alert("Please select a valid image");
+      return;
+    }
 
     try {
+      // IMPORTANT:
+      // Use loading because this is the state variable we created above.
+      setLoading(true);
+
       const API = process.env.NEXT_PUBLIC_API_URL;
 
       // ==========================================
       // STEP 1: GET R2 PRESIGNED UPLOAD URL
       // ==========================================
-      const uploadUrlRes = await fetch(
+
+      const uploadUrlResponse = await fetch(
         `${API}/api/banner/upload-url`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include",
           body: JSON.stringify({
             fileName: image.name,
             contentType: image.type,
@@ -116,24 +137,23 @@ export default function UploadBanner() {
         }
       );
 
-      const uploadData = await uploadUrlRes.json();
+      const uploadData = await uploadUrlResponse.json();
 
-      if (!uploadUrlRes.ok) {
+      if (!uploadUrlResponse.ok) {
         throw new Error(
           uploadData.error || "Failed to generate upload URL"
         );
       }
 
-      const {
-        uploadUrl,
-        fileKey,
-        imageUrl,
-      } = uploadData;
+      const { uploadUrl, fileKey } = uploadData;
+
+      console.log("R2 fileKey:", fileKey);
 
       // ==========================================
       // STEP 2: UPLOAD IMAGE DIRECTLY TO R2
       // ==========================================
-      const r2Res = await fetch(uploadUrl, {
+
+      const r2Response = await fetch(uploadUrl, {
         method: "PUT",
         headers: {
           "Content-Type": image.type,
@@ -141,42 +161,63 @@ export default function UploadBanner() {
         body: image,
       });
 
-      if (!r2Res.ok) {
-        throw new Error("R2 image upload failed");
+      if (!r2Response.ok) {
+        throw new Error(
+          "Failed to upload image to Cloudflare R2"
+        );
       }
 
+      console.log("Image uploaded successfully to R2");
+
       // ==========================================
-      // STEP 3: SAVE BANNER DATA TO MONGODB
+      // STEP 3: CREATE PUBLIC IMAGE URL
       // ==========================================
-      const saveRes = await fetch(
+
+      const R2_PUBLIC_URL =
+        "https://pub-49b621cccf6e46a4aed9d16e4484e094.r2.dev";
+
+      const imageUrl = `${R2_PUBLIC_URL}/${fileKey}`;
+
+      console.log("Image URL:", imageUrl);
+
+      // ==========================================
+      // STEP 4: SAVE BANNER INFORMATION IN MONGODB
+      // ==========================================
+
+      const bannerResponse = await fetch(
         `${API}/api/banner`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include",
           body: JSON.stringify({
-            imageUrl,
-            fileKey,
+            imageUrl: imageUrl,
+            fileKey: fileKey,
           }),
         }
       );
 
-      const saveData = await saveRes.json();
+      const bannerData = await bannerResponse.json();
 
-      if (!saveRes.ok) {
+      if (!bannerResponse.ok) {
         throw new Error(
-          saveData.error || "Failed to save banner"
+          bannerData.error || "Failed to save banner"
         );
       }
 
       // ==========================================
       // SUCCESS
       // ==========================================
-      alert("Banner Uploaded Successfully");
 
-      setPreview(null);
+      console.log("Banner saved:", bannerData);
+
+      alert("Banner uploaded successfully!");
+
+      // Reset selected image
       setImage(null);
+      setPreview(null);
 
       // Refresh banner list
       fetchBanners();
@@ -184,16 +225,18 @@ export default function UploadBanner() {
     } catch (error) {
       console.error("Banner upload error:", error);
 
-      alert(error.message || "Upload failed");
+      alert(error.message || "Banner upload failed");
 
     } finally {
+      // IMPORTANT:
+      // Use loading, NOT setUploading.
       setLoading(false);
     }
   };
 
-  // ==============================
+  // ==========================================
   // DELETE BANNER
-  // ==============================
+  // ==========================================
   const deleteBanner = async (id) => {
     if (!confirm("Are you sure you want to delete this banner?")) {
       return;
@@ -204,6 +247,7 @@ export default function UploadBanner() {
         `${process.env.NEXT_PUBLIC_API_URL}/api/banner/${id}`,
         {
           method: "DELETE",
+          credentials: "include",
         }
       );
 
@@ -393,6 +437,7 @@ export default function UploadBanner() {
           {banners.length === 0 ? (
 
             <div className="text-center py-10 text-gray-300">
+
               <div className="text-4xl mb-2">
                 🖼️
               </div>
@@ -400,6 +445,7 @@ export default function UploadBanner() {
               <p className="text-sm">
                 No banners uploaded yet.
               </p>
+
             </div>
 
           ) : (
