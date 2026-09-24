@@ -528,9 +528,14 @@ export default function MartyrVeerJawanPage() {
         })
       : "—";
 
-  const makeFileHandler = (setFile, setPreview) => (e) => {
+  const MAX_IMAGE_SIZE = 1 * 1024 * 1024; // 1 MB
+
+  const makeFileHandler = (setFile, setPreview, fieldName) => (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    if (!file.type.startsWith("image/")) { setError(`${fieldName} must be an image file.`); e.target.value = ""; return; }
+    if (file.size > MAX_IMAGE_SIZE) { setError(`${fieldName} must be less than 1 MB.`); e.target.value = ""; return; }
+    setError("");
     setFile(file);
     const reader = new FileReader();
     reader.onloadend = () => setPreview(reader.result);
@@ -591,6 +596,10 @@ export default function MartyrVeerJawanPage() {
     e.preventDefault();
     setError("");
     setSuccess("");
+
+    if (photoFile && photoFile.size > MAX_IMAGE_SIZE) { setError("Photo must be less than 1 MB."); return; }
+    if (certFile && certFile.size > MAX_IMAGE_SIZE) { setError("Certificate must be less than 1 MB."); return; }
+
     try {
       setLoading(true);
       const payload = {
@@ -907,7 +916,7 @@ export default function MartyrVeerJawanPage() {
                 preview={photoPreview}
                 inputRef={photoRef}
                 isChanged={!!photoFile}
-                onChange={makeFileHandler(setPhotoFile, setPhotoPreview)}
+                onChange={makeFileHandler(setPhotoFile, setPhotoPreview, "Photo")}
                 onClear={() => {
                   setPhotoFile(null);
                   setPhotoPreview(null);
@@ -920,7 +929,7 @@ export default function MartyrVeerJawanPage() {
                 preview={certPreview}
                 inputRef={certRef}
                 isChanged={!!certFile}
-                onChange={makeFileHandler(setCertFile, setCertPreview)}
+                onChange={makeFileHandler(setCertFile, setCertPreview, "Certificate")}
                 onClear={() => {
                   setCertFile(null);
                   setCertPreview(null);
@@ -929,7 +938,7 @@ export default function MartyrVeerJawanPage() {
               />
             </div>
             <p className="text-[10px] text-gray-400 font-medium mt-2">
-              Accepted formats: JPG, PNG, WEBP · Max 5 MB each
+              Accepted formats: JPG, PNG, WEBP · Max 1 MB each
             </p>
             {/* ── YouTube Link ── */}
             <div className="mt-4 max-w-lg">
